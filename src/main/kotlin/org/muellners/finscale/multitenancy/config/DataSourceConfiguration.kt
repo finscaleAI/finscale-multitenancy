@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Primary
 
 @Configuration
 class DataSourceConfiguration(
-    @Qualifier("primaryTenantDataSource") val primaryTenantDataSource: DataSource
+    @Qualifier("primaryTenantDataSource") private val primaryTenantDataSource: DataSource
 ) {
 
     @Primary

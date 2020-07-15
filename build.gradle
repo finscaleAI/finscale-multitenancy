@@ -36,7 +36,7 @@ plugins {
 group = "org.muellners.finscale.multitenancy"
 version = "0.0.1-SNAPSHOT"
 
-description = ""
+description = "Finscale Multitenancy library"
 
 sourceCompatibility=1.8
 targetCompatibility=1.8
@@ -246,6 +246,13 @@ if (project.hasProperty("gae")) {
         }
     }
     bootJar.dependsOn = [createPom]
+}
+
+jar {
+    enabled= true
+    // Is this required ?
+    archiveBaseName= 'finscale-m'
+    archiveVersion= '0.0.1'
 }
 
 task cleanResources(type: Delete) {
