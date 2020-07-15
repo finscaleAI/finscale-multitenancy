@@ -11,8 +11,6 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-noarg:${kotlin_version}"
         classpath "org.jlleitschuh.gradle:ktlint-gradle:9.0.0"
         classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:${detekt_version}"
-
-        //jhipster-needle-gradle-buildscript-dependency - JHipster will add additional gradle build script plugins here
     }
 }
 
@@ -21,16 +19,10 @@ plugins {
     id "maven-publish"
     id "idea"
     id "jacoco"
-    id "org.springframework.boot"
-    id "com.google.cloud.tools.jib"
-    id "com.gorylenko.gradle-git-properties"
     id "net.ltgt.apt-eclipse"
     id "net.ltgt.apt-idea"
     id "net.ltgt.apt"
-    id "org.liquibase.gradle"
     id "org.sonarqube"
-    id "io.spring.nohttp"
-    //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
 }
 
 group = "org.muellners.finscale.multitenancy"
@@ -42,16 +34,8 @@ sourceCompatibility=1.8
 targetCompatibility=1.8
 assert System.properties["java.specification.version"] == "1.8" || "11" || "12" || "13" || "14"
 
-apply from: "gradle/docker.gradle"
 apply from: "gradle/sonar.gradle"
 apply from: 'gradle/kotlin.gradle'
-//jhipster-needle-gradle-apply-from - JHipster will add additional gradle scripts to be applied here
-
-if (project.hasProperty("prod") || project.hasProperty("gae")) {
-    apply from: "gradle/profile_prod.gradle"
-} else {
-    apply from: "gradle/profile_dev.gradle"
-}
 
 if (project.hasProperty("war")) {
     apply from: "gradle/war.gradle"
@@ -85,12 +69,6 @@ eclipse {
             }
         }
     }
-}
-
-defaultTasks "bootRun"
-
-springBoot {
-    mainClassName = "org.muellners.finscale.multitenancy.MultitenancyApp"
 }
 
 test {
@@ -137,71 +115,10 @@ task integrationTestReport(type: TestReport) {
     reportOn integrationTest
 }
 
-if (!project.hasProperty("runList")) {
-    project.ext.runList = "main"
-}
-
-project.ext.diffChangelogFile = "src/main/resources/config/liquibase/changelog/" + new Date().format("yyyyMMddHHmmss") + "_changelog.xml"
-
-liquibase {
-    activities {
-        main {
-            driver "org.h2.Driver"
-            url "jdbc:h2:file:./build/h2db/db/multitenancy"
-            username "multitenancy"
-            password ""
-            changeLogFile "src/main/resources/config/liquibase/master.xml"
-            defaultSchemaName ""
-            logLevel "debug"
-            classpath "src/main/resources/"
-        }
-        diffLog {
-            driver "org.h2.Driver"
-            url "jdbc:h2:file:./build/h2db/db/multitenancy"
-            username "multitenancy"
-            password ""
-            changeLogFile project.ext.diffChangelogFile
-            referenceUrl "hibernate:spring:org.muellners.finscale.multitenancy.domain?dialect=org.hibernate.dialect.H2Dialect&hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy&hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy"
-            defaultSchemaName ""
-            logLevel "debug"
-            classpath "$buildDir/classes/java/main"
-        }
-    }
-
-    runList = project.ext.runList
-}
-
-gitProperties {
-    failOnNoGitDirectory = false
-    keys = ["git.branch", "git.commit.id.abbrev", "git.commit.id.describe"]
-}
-
-checkstyle {
-    toolVersion '${checkstyle_version}'
-    configFile file("checkstyle.xml")
-    checkstyleTest.enabled = false
-}
-nohttp {
-    source.include "build.gradle", "README.md"
-}
-
-configurations {
-    providedRuntime
-    implementation.exclude module: "spring-boot-starter-tomcat"
-    all {
-        resolutionStrategy {
-            // Inherited version from Spring Boot can't be used because of regressions:
-            // To be removed as soon as spring-boot use the same version
-            force 'org.liquibase:liquibase-core:3.9.0'
-        }
-    }
-}
-
 repositories {
     mavenLocal()
     mavenCentral()
     jcenter()
-    //jhipster-needle-gradle-repositories - JHipster will add additional repositories
 }
 
 dependencies {
@@ -216,17 +133,9 @@ dependencies {
     implementation "org.liquibase:liquibase-core"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-data-redis"
-    if (!project.hasProperty("gae")) {
-        runtimeOnly "io.jsonwebtoken:jjwt-impl"
-        runtimeOnly "io.jsonwebtoken:jjwt-jackson"
-    } else {
-        implementation "io.jsonwebtoken:jjwt-impl"
-        implementation "io.jsonwebtoken:jjwt-jackson"
-    }
     implementation ("io.springfox:springfox-swagger2") {
         exclude module: "mapstruct"
     }
-
     testImplementation ("org.springframework.boot:spring-boot-starter-test") {
         exclude group: "org.junit.vintage", module: "junit-vintage-engine"
     }
@@ -248,13 +157,6 @@ if (project.hasProperty("gae")) {
     bootJar.dependsOn = [createPom]
 }
 
-jar {
-    enabled= true
-    // Is this required ?
-    archiveBaseName= 'finscale-m'
-    archiveVersion= '0.0.1'
-}
-
 task cleanResources(type: Delete) {
     delete "build/resources"
 }
@@ -264,4 +166,3 @@ wrapper {
 }
 
 compileJava.dependsOn processResources
-processResources.dependsOn bootBuildInfo

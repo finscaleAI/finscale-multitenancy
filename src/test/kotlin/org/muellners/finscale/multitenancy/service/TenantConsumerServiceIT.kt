@@ -1,4 +1,4 @@
-package org.muellners.finscale.multitenancy
+package org.muellners.finscale.multitenancy.service
 
 import javax.transaction.Transactional
 import org.junit.Test
@@ -6,7 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
 @Transactional
-class TenantConsumerService {
+class TenantConsumerServiceIT {
 
     fun init() {
     }
