@@ -161,6 +161,11 @@ task cleanResources(type: Delete) {
     delete "build/resources"
 }
 
+// This fix the issue related to the jacocoTestReports :) This is quite funny we should 
+jacocoTestReport {
+    getExecutionData().setFrom(fileTree(buildDir).include("/jacoco/*.exec"))
+}
+
 wrapper {
     gradleVersion = "6.5"
 }
