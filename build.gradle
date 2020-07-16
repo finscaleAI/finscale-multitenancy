@@ -129,6 +129,7 @@ dependencies {
 
     // Use ", version: jhipster_dependencies_version, changing: true" if you want
     // to use a SNAPSHOT release instead of a stable release
+    implementation "org.hibernate.validator:hibernate-validator"
     implementation "com.zaxxer:HikariCP"
     implementation "org.liquibase:liquibase-core"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
@@ -161,7 +162,7 @@ task cleanResources(type: Delete) {
     delete "build/resources"
 }
 
-// This fix the issue related to the jacocoTestReports :) This is quite funny we should 
+// This fix the issue related to the jacocoTestReports :) This is quite funny we should
 jacocoTestReport {
     getExecutionData().setFrom(fileTree(buildDir).include("/jacoco/*.exec"))
 }
