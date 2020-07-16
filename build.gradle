@@ -161,8 +161,31 @@ task cleanResources(type: Delete) {
     delete "build/resources"
 }
 
+// This fix the issue related to the jacocoTestReports :) This is quite funny we should 
+jacocoTestReport {
+    getExecutionData().setFrom(fileTree(buildDir).include("/jacoco/*.exec"))
+}
+
 wrapper {
     gradleVersion = "6.5"
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/muellners/finscale-multitenancy")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
+        }
+    }
 }
 
 compileJava.dependsOn processResources
